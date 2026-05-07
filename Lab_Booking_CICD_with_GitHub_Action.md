@@ -1556,10 +1556,9 @@ git push origin main
 
 **แนบรูป GitHub Actions Workflow ที่ผ่านทั้งหมด**:
 
-```plaintext
+plaintext
 # แนบ screenshot ที่นี่
-
-```
+![alt text](image-1.png)
 
 ---
 
@@ -1763,10 +1762,10 @@ Deployment สำเร็จ
 **ทดสอบ Frontend (Vercel)**:
 
 เปิด browser ไปที่ Vercel URL ของคุณ ทดสอบ:
-- [ ] หน้าแสดงรายการห้องพัก
-- [ ] ฟอร์มการจองทำงาน
-- [ ] หน้า Admin login ทำงาน
-- [ ] Dashboard Admin แสดงข้อมูลถูกต้อง
+- [✅] หน้าแสดงรายการห้องพัก
+- [✅] ฟอร์มการจองทำงาน
+- [✅] หน้า Admin login ทำงาน
+- [✅] Dashboard Admin แสดงข้อมูลถูกต้อง
 
 **ทดสอบ Backend (Render) ด้วย curl**:
 
