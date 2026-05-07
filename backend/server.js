@@ -419,12 +419,13 @@ app.get('/api/reports/export', authenticateToken, async (req, res) => {
 
 
 const generalLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // หน้าต่างเวลา: 15 นาที
-  max: 100,                  // สูงสุด 100 requests ต่อ IP ต่อ 15 นาที
-  standardHeaders: true,     // ส่ง RateLimit headers กลับไปให้ client
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
   legacyHeaders: false,
-  message: {
-    error: 'Too many requests. Please try again in 15 minutes.'
+  handler: (req, res, next) => {
+    console.log('Rate limit triggered for', req.originalUrl);
+    res.status(429).json({ error: 'Too many requests. Please try again in 15 minutes.' });
   }
 });
 
@@ -432,13 +433,14 @@ const generalLimiter = rateLimit({
 const loginLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // หน้าต่างเวลา: 1 ชั่วโมง
   max: 10,                   // สูงสุด 10 attempts ต่อ IP ต่อชั่วโมง
-  message: {
-    error: 'Too many login attempts. Account temporarily locked for 1 hour.'
+  handler: (req, res, next) => {
+    console.log('Rate limit triggered for', req.originalUrl);
+    res.status(429).json({ error: 'Too many login attempts. Account temporarily locked for 1 hour.' });
   },
   skipSuccessfulRequests: true, // ไม่นับ request ที่ login สำเร็จ
 });
 
-app.use('/api/', generalLimiter);
+app.use('/api', generalLimiter);
 app.use('/api/login', loginLimiter); // เข้มงวดกว่าสำหรับ login
 
 
