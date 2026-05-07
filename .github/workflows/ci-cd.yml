@@ -234,6 +234,7 @@ jobs:
           args: >
             --enableRetired
             --failOnCVSS 7
+            --exclude "**/node_modules/**"
         # failOnCVSS 7 = หยุดถ้าพบ CVSS score ≥ 7.0 (High)
 
       - name: Upload OWASP report
