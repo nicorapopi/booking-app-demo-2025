@@ -1798,10 +1798,44 @@ curl -I $BACKEND/api/rooms
 
 > 🪟 **Windows (Git Bash)**: คำสั่ง `export` และ multi-line `curl` ทำงานได้ปกติใน Git Bash ไม่ต้องเปลี่ยน syntax ใด ๆ
 
+
 **บันทึกผลการทดสอบบน Production**:
 
 ```plaintext
 # วาง output ที่นี่
+curl $BACKEND/api/rooms
+[{"id":2,"roomType":"deluxe","name":"ห้องดีลักซ์","description":"พื้นที่กว้างขึ้น เหมาะสำหรับ 2-3 ท่าน","capacity":3,"price":1800,"createdAt":"2026-05-07T08:23:19.815Z"},{"id":1,"roomType":"standard","name":"ห้องมาตรฐาน","description":"ห้องพักสำหรับ 1-2 ท่าน พร้อมสิ่งอำนวยความสะดวกพื้นฐาน","capacity":2,"price":1200,"createdAt":"2026-05-07T08:23:19.809Z"},{"id":3,"roomType":"suite","name":"ห้องสวีท","description":"ห้องพักขนาดใหญ่สำหรับครอบครัวหรือกลุ่ม","capacity":4,"price":2500,"createdAt":"2026-05-07T08:23:19.818Z"}]%   
+
+
+curl -s -X POST $BACKEND/api/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"admin123"}'
+{"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJhZG1pbiIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc3ODE1NDMwMCwiZXhwIjoxNzc4MTU3OTAwfQ.DlXFkuTV15_KtIlGDFoNBy53l90fjEG_Bp0fjd4kOWU","user":{"id":1,"username":"admin","role":"admin"}}% 
+
+curl $BACKEND/api/bookings \
+  -H "Authorization: Bearer $TOKEN"
+[]%                       
+
+
+url $BACKEND/api/reports \
+  -H "Authorization: Bearer $TOKEN"
+{"bookings":[],"summaryByRoom":{},"summaryByStatus":{},"totalNights":0,"totalBookings":0}
+
+
+curl -I $BACKEND/api/rooms
+HTTP/2 200 
+date: Thu, 07 May 2026 11:46:26 GMT
+content-type: application/json; charset=utf-8
+access-control-allow-origin: *
+etag: W/"32f-Kym5gLXpaast/GyVub2cojk3T5M"
+rndr-id: 70be2df6-7d95-45df
+server: cloudflare
+vary: Accept-Encoding
+x-powered-by: Express
+x-render-origin-server: Render
+cf-cache-status: DYNAMIC
+cf-ray: 9f7ffbf07f004ba6-BKK
+alt-svc: h3=":443"; ma=86400
 
 ```
 
