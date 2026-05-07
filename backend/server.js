@@ -7,6 +7,7 @@ const path = require('path');
 const db = require('./database');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const cors = require('cors');
 
 const app = express();
 const PORT = 3001;
@@ -442,6 +443,30 @@ const loginLimiter = rateLimit({
 
 app.use('/api', generalLimiter);
 app.use('/api/login', loginLimiter); // เข้มงวดกว่าสำหรับ login
+
+// ❌ ไม่ปลอดภัย — อนุญาตทุก origin
+app.use(cors());
+
+// ✅ ปลอดภัย — กำหนด origin ที่อนุญาตชัดเจน
+const allowedOrigins = [
+  'https://booking.vercel.app',      // Production frontend
+  'https://qa-booking.vercel.app',   // QA frontend
+  'http://localhost:5173',           // Local development
+];
+
+app.use(cors({
+  origin: (origin, callback) => {
+    // อนุญาต requests ที่ไม่มี origin (เช่น curl, Postman)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error(`CORS blocked: ${origin} not allowed`));
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,    // อนุญาต cookies ใน cross-origin requests
+}));
 
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
