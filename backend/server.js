@@ -7,7 +7,6 @@ const path = require('path');
 const db = require('./database');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-const cors = require('cors');
 
 const app = express();
 const PORT = 3001;
@@ -17,26 +16,44 @@ if (!fs.existsSync(REPORT_DIR)) {
   fs.mkdirSync(REPORT_DIR, { recursive: true });
 }
 
-app.use(cors());
-app.use(express.json());
-
-app.use(helmet()); // เปิดใช้ทุก headers ในชุดมาตรฐาน
-
-// หรือกำหนด custom policy
+// ใช้ helmet แบบ custom policy หรือ default แค่ครั้งเดียว (แนะนำ custom policy)
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
-      defaultSrc: ["'self'"],           // อนุญาตเฉพาะ same origin
-      scriptSrc: ["'self'"],            // script จาก same origin เท่านั้น
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'"],
       imgSrc: ["'self'", "data:", "https:"],
     },
   },
-  frameguard: { action: 'deny' },       // ห้าม iframe ทุกชนิด
+  frameguard: { action: 'deny' },
   hsts: {
-    maxAge: 31536000,                   // 1 ปี
+    maxAge: 31536000,
     includeSubDomains: true,
   }
+}));
+
+app.use(express.json());
+
+// ✅ ปลอดภัย — กำหนด origin ที่อนุญาตชัดเจน
+const allowedOrigins = [
+  'https://booking.vercel.app',      // Production frontend
+  'https://qa-booking.vercel.app',   // QA frontend
+  'http://localhost:5173',           // Local development
+];
+
+app.use(cors({
+  origin: (origin, callback) => {
+    // อนุญาต requests ที่ไม่มี origin (เช่น curl, Postman)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error(`CORS blocked: ${origin} not allowed`));
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,    // อนุญาต cookies ใน cross-origin requests
 }));
 
 const STATUS_VALUES = ['pending', 'confirmed', 'cancelled', 'completed'];
@@ -443,30 +460,6 @@ const loginLimiter = rateLimit({
 
 app.use('/api', generalLimiter);
 app.use('/api/login', loginLimiter); // เข้มงวดกว่าสำหรับ login
-
-// ❌ ไม่ปลอดภัย — อนุญาตทุก origin
-app.use(cors());
-
-// ✅ ปลอดภัย — กำหนด origin ที่อนุญาตชัดเจน
-const allowedOrigins = [
-  'https://booking.vercel.app',      // Production frontend
-  'https://qa-booking.vercel.app',   // QA frontend
-  'http://localhost:5173',           // Local development
-];
-
-app.use(cors({
-  origin: (origin, callback) => {
-    // อนุญาต requests ที่ไม่มี origin (เช่น curl, Postman)
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error(`CORS blocked: ${origin} not allowed`));
-    }
-  },
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true,    // อนุญาต cookies ใน cross-origin requests
-}));
 
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
