@@ -5,6 +5,8 @@ const bcrypt = require('bcryptjs');
 const fs = require('fs');
 const path = require('path');
 const db = require('./database');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 
 const app = express();
 const PORT = 3001;
@@ -16,6 +18,25 @@ if (!fs.existsSync(REPORT_DIR)) {
 
 app.use(cors());
 app.use(express.json());
+
+app.use(helmet()); // เปิดใช้ทุก headers ในชุดมาตรฐาน
+
+// หรือกำหนด custom policy
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],           // อนุญาตเฉพาะ same origin
+      scriptSrc: ["'self'"],            // script จาก same origin เท่านั้น
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:", "https:"],
+    },
+  },
+  frameguard: { action: 'deny' },       // ห้าม iframe ทุกชนิด
+  hsts: {
+    maxAge: 31536000,                   // 1 ปี
+    includeSubDomains: true,
+  }
+}));
 
 const STATUS_VALUES = ['pending', 'confirmed', 'cancelled', 'completed'];
 
@@ -395,6 +416,31 @@ app.get('/api/reports/export', authenticateToken, async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+
+const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // หน้าต่างเวลา: 15 นาที
+  max: 100,                  // สูงสุด 100 requests ต่อ IP ต่อ 15 นาที
+  standardHeaders: true,     // ส่ง RateLimit headers กลับไปให้ client
+  legacyHeaders: false,
+  message: {
+    error: 'Too many requests. Please try again in 15 minutes.'
+  }
+});
+
+// Rate limit เข้มข้นสำหรับ Login (ป้องกัน Brute Force)
+const loginLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // หน้าต่างเวลา: 1 ชั่วโมง
+  max: 10,                   // สูงสุด 10 attempts ต่อ IP ต่อชั่วโมง
+  message: {
+    error: 'Too many login attempts. Account temporarily locked for 1 hour.'
+  },
+  skipSuccessfulRequests: true, // ไม่นับ request ที่ login สำเร็จ
+});
+
+app.use('/api/', generalLimiter);
+app.use('/api/login', loginLimiter); // เข้มงวดกว่าสำหรับ login
+
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 // Pipeline test Thu May  7 18:52:24 +07 2026
