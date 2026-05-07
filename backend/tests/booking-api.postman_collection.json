@@ -125,7 +125,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"name\": \"Deluxe Room 101\", \"type\": \"Deluxe\", \"capacity\": 2, \"price\": 1500}"
+              "raw": "{\"name\": \"Super Deluxe Room 999\", \"type\": \"super-deluxe\", \"description\": \"A beautiful deluxe room\", \"capacity\": 2, \"price\": 1500}"
             },
             "url": "{{baseUrl}}/api/rooms"
           }
@@ -159,7 +159,7 @@
             "header": [{"key": "Content-Type", "value": "application/json"}],
             "body": {
               "mode": "raw",
-              "raw": "{\"fullname\": \"Test Guest\", \"email\": \"test@example.com\", \"phone\": \"0123456789\", \"roomId\": {{roomId}}, \"checkin\": \"2025-09-01\", \"checkout\": \"2025-09-03\", \"guests\": 2}"
+              "raw": "{\"fullname\": \"Test Guest\", \"email\": \"test@example.com\", \"phone\": \"0123456789\", \"roomId\": \"{{roomId}}\", \"checkin\": \"2025-09-01\", \"checkout\": \"2025-09-03\", \"guests\": 2}"
             },
             "url": "{{baseUrl}}/api/bookings"
           }

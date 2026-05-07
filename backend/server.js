@@ -34,6 +34,10 @@ app.use(helmet({
 }));
 
 app.use(express.json());
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url} - ${new Date().toISOString()}`);
+  next();
+});
 
 // ✅ ปลอดภัย — กำหนด origin ที่อนุญาตชัดเจน
 const allowedOrigins = [
@@ -114,11 +118,16 @@ const validateBookingData = async (data, isUpdate = false) => {
 
   let room = null;
   if (data.roomId !== undefined && data.roomId !== null) {
-    room = await db.room.findUnique({ where: { id: Number(data.roomId) } });
-    if (!room) {
-      errors.push('ไม่พบห้องพักที่เลือก');
-    } else if (data.guests !== undefined && Number(data.guests) > room.capacity) {
-      errors.push(`จำนวนผู้เข้าพักสูงสุดสำหรับห้องนี้คือ ${room.capacity} ท่าน`);
+    const roomId = Number(data.roomId);
+    if (isNaN(roomId)) {
+      errors.push('roomId ต้องเป็นตัวเลข');
+    } else {
+      room = await db.room.findUnique({ where: { id: roomId } });
+      if (!room) {
+        errors.push('ไม่พบห้องพักที่เลือก');
+      } else if (data.guests !== undefined && Number(data.guests) > room.capacity) {
+        errors.push(`จำนวนผู้เข้าพักสูงสุดสำหรับห้องนี้คือ ${room.capacity} ท่าน`);
+      }
     }
   } else if (!isUpdate) {
     errors.push('กรุณาเลือกห้องพัก');
@@ -186,6 +195,8 @@ app.post('/api/login', async (req, res) => {
       JWT_SECRET,
       { expiresIn: '1h' }
     );
+
+    console.log(`Generated token for ${username}: ${token.substring(0, 10)}...`);
 
     res.json({
       token,
