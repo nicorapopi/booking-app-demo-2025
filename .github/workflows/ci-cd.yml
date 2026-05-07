@@ -229,7 +229,7 @@ jobs:
         id: depcheck
         with:
           project: 'booking-app'
-          path: '.'
+          path: './backend ./frontend'
           format: 'HTML'
           args: >
             --enableRetired
