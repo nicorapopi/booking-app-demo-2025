@@ -2404,7 +2404,15 @@ done
 
 ```plaintext
 # บันทึก headers และคำอธิบายที่นี่
-
+Content-Security-Policy (CSP)	ป้องกัน XSS และ Data Injection: เปรียบเหมือน "White-list" ที่บอก Browser ว่าอนุญาตให้โหลดข้อมูลจากแหล่งไหนได้บ้าง (เช่น ห้ามรัน Inline Script ที่แฮกเกอร์ฝังมา)
+X-Frame-Options: DENY	ป้องกัน Clickjacking: ห้ามนำหน้าเว็บ/API นี้ไปใส่ใน <iframe> บนเว็บไซต์อื่นโดยเด็ดขาด เพื่อป้องกันการหลอกให้ผู้ใช้กดปุ่มที่มองไม่เห็น
+X-Content-Type-Options: nosniff	ป้องกัน MIME Sniffing: บังคับให้ Browser เชื่อตาม Content-Type ที่ส่งไปเท่านั้น ป้องกันการแอบรันไฟล์ข้อความให้กลายเป็น Script
+Strict-Transport-Security (HSTS)	บังคับใช้ HTTPS: สั่งให้ Browser เชื่อมต่อผ่าน HTTPS เท่านั้นตลอด 1 ปี (max-age=31536000) ป้องกันการโจมตีแบบดักฟังข้อมูล (MitM)
+Referrer-Policy: no-referrer	ความเป็นส่วนตัว (Privacy): ไม่ส่งข้อมูล URL ต้นทางไปกับ Header เมื่อคลิก Link ออกไปข้างนอก เพื่อไม่ให้ข้อมูลส่วนตัวใน URL รั่วไหล
+X-DNS-Prefetch-Control: off	ความเป็นส่วนตัว: ปิดการทำงานที่ Browser แอบตรวจสอบ DNS ของ Link ต่างๆ ล่วงหน้า ซึ่งอาจถูกใช้ส่องพฤติกรรมผู้ใช้ได้
+Cross-Origin-Opener-Policy	ป้องกันการเข้าถึง Process: ช่วยแยก Process ของหน้าเว็บออกจากกัน ป้องกันการโจมตีประเภท Spectre/Meltdown ที่จะพยายามอ่านข้อมูลใน Memory
+X-Download-Options: noopen	ป้องกันไฟล์อันตราย (IE8+): บังคับให้ผู้ใช้ต้อง Save ไฟล์ลงเครื่องก่อนเปิด ป้องกันการรันสคริปต์อัตโนมัติในบริบทของเว็บไซต์เรา
+X-XSS-Protection: 0	ปิดตัวกรองเก่า: เนื่องจากปัจจุบันเราใช้ CSP ที่ดีกว่ามากแล้ว การปิดตัวนี้ช่วยป้องกันช่องโหว่ใหม่ๆ ที่เกิดจากตัวแก้ XSS รุ่นเก่าของ Browser เอง
 ```
 
 ---
@@ -2548,45 +2556,45 @@ options: >-
 ตรวจสอบว่าทำสำเร็จทุกข้อ:
 
 **การเตรียม Repository**:
-- [x] Fork repository `booking-app-demo-2025` สำเร็จ
-- [x] Clone และทำความเข้าใจโครงสร้างโปรเจกต์ทั้งหมด
-- [x] อ่านและอธิบาย Prisma schema ได้
+- [✅] Fork repository `booking-app-demo-2025` สำเร็จ
+- [✅] Clone และทำความเข้าใจโครงสร้างโปรเจกต์ทั้งหมด
+- [✅] อ่านและอธิบาย Prisma schema ได้
 
 **Local Development**:
-- [x] รัน PostgreSQL ด้วย Docker Compose สำเร็จ
-- [x] รัน Prisma migrations สำเร็จ
-- [x] Backend server ทำงานและ API endpoints ตอบสนองถูกต้อง
-- [x] Frontend build สำเร็จและแสดงผลใน browser
+- [✅] รัน PostgreSQL ด้วย Docker Compose สำเร็จ
+- [✅] รัน Prisma migrations สำเร็จ
+- [✅] Backend server ทำงานและ API endpoints ตอบสนองถูกต้อง
+- [✅] Frontend build สำเร็จและแสดงผลใน browser
 
 **API Testing**:
-- [x] สร้าง Postman Collection ที่ครอบคลุม endpoints หลัก
-- [x] รัน Newman tests ในเครื่องผ่านทั้งหมด
-- [x] ทดสอบทั้ง positive cases และ negative cases
+- [✅] สร้าง Postman Collection ที่ครอบคลุม endpoints หลัก
+- [✅] รัน Newman tests ในเครื่องผ่านทั้งหมด
+- [✅] ทดสอบทั้ง positive cases และ negative cases
 
 **Security**:
-- [x] ติดตั้งและตั้งค่า Helmet.js ใน backend
-- [x] ตั้งค่า Rate Limiting สำหรับ API และ Login endpoint
-- [x] ตั้งค่า CORS อย่างถูกต้อง (ระบุ origin ชัดเจน)
-- [x] รัน `npm audit` และไม่พบ high/critical vulnerability
-- [x] Security Scanning Job ทำงานใน GitHub Actions
+- [✅] ติดตั้งและตั้งค่า Helmet.js ใน backend
+- [✅] ตั้งค่า Rate Limiting สำหรับ API และ Login endpoint
+- [✅] ตั้งค่า CORS อย่างถูกต้อง (ระบุ origin ชัดเจน)
+- [✅] รัน `npm audit` และไม่พบ high/critical vulnerability
+- [✅] Security Scanning Job ทำงานใน GitHub Actions
 
 **GitHub Actions**:
-- [x] สร้าง workflow ไฟล์ `ci-cd.yml` ที่มีทั้ง CI, Security Scan, CD และ Post-Deploy Test
-- [x] Workflow ทำงาน automatic เมื่อ push code
-- [x] Newman tests รันใน CI สำเร็จ
-- [x] Security scanning job ผ่าน
-- [x] Post-Deploy Smoke Tests ผ่านบน Production
+- [✅] สร้าง workflow ไฟล์ `ci-cd.yml` ที่มีทั้ง CI, Security Scan, CD และ Post-Deploy Test
+- [✅] Workflow ทำงาน automatic เมื่อ push code
+- [✅] Newman tests รันใน CI สำเร็จ
+- [✅] Security scanning job ผ่าน
+- [✅] Post-Deploy Smoke Tests ผ่านบน Production
 
 **Cloud Deployment**:
-- [x] ตั้งค่า Vercel และ deploy frontend สำเร็จ
-- [x] ตั้งค่า Render และ deploy backend สำเร็จ
-- [x] ตั้งค่า GitHub Secrets ครบทุกตัว
-- [x] Smoke tests ผ่านหลัง deployment
-- [x] ทดสอบ API บน production URL สำเร็จ
+- [✅] ตั้งค่า Vercel และ deploy frontend สำเร็จ
+- [✅] ตั้งค่า Render และ deploy backend สำเร็จ
+- [✅] ตั้งค่า GitHub Secrets ครบทุกตัว
+- [✅] Smoke tests ผ่านหลัง deployment
+- [✅] ทดสอบ API บน production URL สำเร็จ
 
 **Multi-Environment** (ข้อเพิ่มเติม):
-- [x] สร้าง GitHub Environments (qa, staging, production)
-- [x] สร้าง develop branch และ push เพื่อ trigger QA deployment
+- [✅] สร้าง GitHub Environments (qa, staging, production)
+- [✅] สร้าง develop branch และ push เพื่อ trigger QA deployment
 
 ### 12.2 คำถามทบทวน
 
@@ -2594,35 +2602,24 @@ options: >-
 อธิบายความแตกต่างระหว่าง Continuous Integration (CI) และ Continuous Deployment (CD) พร้อมยกตัวอย่างจาก workflow ที่สร้างในการทดลองนี้
 
 ```plaintext
-CI (Continuous Integration) คือกระบวนการรวมโค้ดจากนักพัฒนาหลายคนเข้าด้วยกันโดยอัตโนมัติ พร้อมรัน Test และ Build เพื่อตรวจสอบความถูกต้องทันที ตัวอย่างใน Lab นี้คือ Job `backend-test` ที่รัน Newman tests และ `frontend-build` ที่ตรวจสอบว่าโปรเจกต์รัน Build ผ่านหรือไม่ก่อนจะไปขั้นตอนถัดไป
+# ตอบที่นี่
 
-CD (Continuous Deployment) คือกระบวนการนำโค้ดที่ผ่านการทดสอบและ Build แล้วไปติดตั้ง (Deploy) บน Production หรือ Environment ต่างๆ โดยอัตโนมัติ ตัวอย่างใน Lab นี้คือ Job `deploy-frontend` ไปยัง Vercel และ `deploy-backend` ไปยัง Render หลังจากที่ขั้นตอน Security Scan และ Test ทั้งหมดผ่านเรียบร้อยแล้ว
 ```
 
 **คำถาม 2 — Multi-Service Architecture**:
 ในโปรเจกต์นี้ Frontend และ Backend ถูก deploy แยกกัน (Vercel vs Render) มีข้อดีและข้อเสียอะไรเมื่อเทียบกับการ deploy บน server เดียวกัน?
 
 ```plaintext
-ข้อดี:
-1. Scalability: สามารถขยายขนาด (Scale) ของ Frontend และ Backend แยกกันได้ตามปริมาณการใช้งานจริง
-2. Isolation: ปัญหาที่เกิดขึ้นกับ Service หนึ่งจะไม่ส่งผลกระทบโดยตรงต่ออีก Service หนึ่ง (Fault Tolerance)
-3. Specialized Hosting: Vercel ปรับแต่งมาเพื่อ Static/Frontend Assets ให้โหลดเร็วทั่วโลก (Edge Config) ส่วน Render เหมาะกับการรัน Dynamic Server และ Database
+# ตอบที่นี่
 
-ข้อเสีย:
-1. Complexity: ต้องจัดการเรื่อง CORS (Cross-Origin Resource Sharing) และการตั้งค่า Environment Variables ให้สื่อสารกันได้
-2. Network Latency: การเรียก API ระหว่าง Platform อาจมีความหน่วง (Latency) มากกว่าการเรียกใน Server เดียวกัน
 ```
 
 **คำถาม 3 — API Testing vs Smoke Testing**:
 Newman CI tests ต่างจาก Post-Deploy Smoke Tests อย่างไร? ทำไมถึงต้องมีทั้งสองแบบ? ยกตัวอย่างสถานการณ์ที่ CI tests ผ่านแต่ Smoke Tests ล้มเหลวได้หรือไม่?
 
 ```plaintext
-ความแตกต่าง:
-- Newman CI Tests: รันบน Environment จำลองหรือชั่วคราว (เช่น GitHub Runner) เพื่อเช็ค Logic ของ Code ก่อน Deploy
-- Smoke Tests (Post-Deploy): รันบน Production จริงหลัง Deploy เสร็จ เพื่อเช็คว่า Service ทำงานร่วมกันได้จริง (เช่น ต่อ Database สำเร็จ, Networking ไม่ติด Firewall)
+# ตอบที่นี่
 
-เหตุการณ์ที่ CI ผ่านแต่ Smoke Fail:
-เช่น ลืมตั้งค่า DATABASE_URL ใน Render Dashboard หรือตั้งค่า CORS ผิดพลาดบน Production ทำให้ Frontend เรียก API จริงไม่ได้ แม้ว่า Code จะทำงานถูกต้องในเครื่องจำลองก็ตาม
 ```
 
 **คำถาม 4 — Security Layers**:
@@ -2630,41 +2627,33 @@ Newman CI tests ต่างจาก Post-Deploy Smoke Tests อย่างไ
 
 | ชั้น | เครื่องมือ | ป้องกันอะไร |
 |---|---|---|
-| Runtime | Helmet.js | XSS, Clickjacking, MIME Sniffing ผ่าน HTTP Headers |
-| Runtime | express-rate-limit | Brute Force และ DDoS โดยจำกัดจำนวน Request จาก IP |
-| Runtime | CORS | ป้องกันเว็บไซต์อื่นที่ไม่ได้รับอนุญาตเข้าถึง API ของเรา |
-| Runtime | bcryptjs | ป้องกันข้อมูลรหัสผ่านรั่วไหลโดยการทำ Password Hashing |
-| CI Pipeline | npm audit | ตรวจหาช่องโหว่ (Vulnerabilities) ใน Library ที่ใช้ |
-| CI Pipeline | TruffleHog | ตรวจหาการหลุดของ Secrets/Keys ใน Source Code |
-| CI Pipeline | OWASP Dep-Check | ตรวจสอบ Dependencies กับฐานข้อมูลช่องโหว่สากล (CVE) |
+| Runtime | Helmet.js | ? |
+| Runtime | express-rate-limit | ? |
+| Runtime | CORS | ? |
+| Runtime | bcryptjs | ? |
+| CI Pipeline | npm audit | ? |
+| CI Pipeline | TruffleHog | ? |
+| CI Pipeline | OWASP Dep-Check | ? |
 
 ```plaintext
-การป้องกันหลายชั้น (Defense in Depth) ช่วยให้หากชั้นใดชั้นหนึ่งหลุดไป ชั้นอื่นจะยังคงทำหน้าที่ปกป้องระบบไว้ได้
+# ตอบที่นี่
+
 ```
 
 **คำถาม 5 — Secrets Management**:
 เหตุใดจึงต้องใช้ GitHub Secrets แทนการเขียนค่า credentials โดยตรงใน workflow YAML file? ถ้าใส่ค่า JWT_SECRET ตรงๆ ใน YAML จะเกิดอะไรขึ้น?
 
 ```plaintext
-เหตุผล:
-1. Security: ป้องกันไม่ให้รหัสผ่านหรือ Secret Keys หลุดเข้าไปอยู่ใน Source Control (Git History) ซึ่งทุกคนที่มีสิทธิ์อ่าน Repo จะเห็นได้
-2. Management: สะดวกต่อการเปลี่ยนค่า (Rotate) โดยไม่ต้องแก้ Code
+# ตอบที่นี่
 
-หากใส่ JWT_SECRET ตรงๆ ใน YAML:
-Secret นั้นจะปรากฏเป็น Plain Text ในไฟล์ `.yml` หากผู้โจมตีเข้าถึง Repository ได้ จะสามารถปลอมแปลง JWT Token เพื่อเข้าถึงระบบในฐานะ Admin ได้ทันที (Account Takeover)
 ```
 
 **คำถาม 6 — Branch Strategy**:
 อธิบาย Git Flow ที่ใช้ในโปรเจกต์นี้ (develop → staging → main) ทำไมต้องมีหลาย environment แทนที่จะ deploy ตรงจาก develop ไป production เลย?
 
 ```plaintext
-Git Flow:
-- develop: สำหรับรัน QA/Automated Tests เพื่อเช็คฟีเจอร์ใหม่
-- staging: สำหรับการทดสอบที่ใกล้เคียง Production มากที่สุด (Pre-release)
-- main: สำหรับ Stable Release ที่พร้อมใช้งานจริง
+# ตอบที่นี่
 
-เหตุผลที่ต้องมีหลาย Environment:
-เพื่อสร้าง "Safety Net" หรือด่านกั้นความผิดพลาด หากพบ Bug ในระดับ develop จะไม่ส่งผลกระทบต่อผู้ใช้จริงบน production และช่วยให้ทีมสามารถพัฒนาหลายฟีเจอร์พร้อมกันได้โดยไม่ขัดแย้งกัน
 ```
 
 ---
