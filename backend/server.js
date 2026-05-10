@@ -49,7 +49,7 @@ const allowedOrigins = [
 app.use(cors({
   origin: (origin, callback) => {
     // อนุญาต requests ที่ไม่มี origin (เช่น curl, Postman)
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
       callback(null, true);
     } else {
       callback(new Error(`CORS blocked: ${origin} not allowed`));
